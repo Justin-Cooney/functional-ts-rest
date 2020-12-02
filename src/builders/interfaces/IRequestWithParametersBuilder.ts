@@ -1,7 +1,7 @@
-import { IRequestWithBodyBuilder } from "./IRequestWithBodyBuilder";
+import { IRequestWithHeadersBuilder } from "./IRequestWithHeadersBuilder";
 
-export interface IRequestWithParametersBuilder extends IRequestWithBodyBuilder {
-	withJSONBody(body: object): IRequestWithBodyBuilder,
-	withFormData(data: { [key: string]: string }): IRequestWithBodyBuilder,
-	withFormDataUrlEncoded(data: { [key: string]: string }): IRequestWithBodyBuilder
+export interface IRequestWithParametersBuilder extends IRequestWithHeadersBuilder {
+	withJSONBody(body: object): IRequestWithHeadersBuilder,
+	withFormData(data: { [key: string]: string }): IRequestWithHeadersBuilder,
+	withFormDataUrlEncoded(data: { [key: string]: string }): IRequestWithHeadersBuilder
 }

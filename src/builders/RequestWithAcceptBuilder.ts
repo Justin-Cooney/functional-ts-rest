@@ -6,17 +6,15 @@ import { HttpMethodType } from "../HttpMethod";
 import fetch, { Headers, RequestInit, Response, Blob } from 'node-fetch';
 
 export abstract class RequestWithAcceptBuilder implements IRequestWithAcceptBuilder {
-	endpoint: string;
 	request: IRequest;
-	parameters: any = {};
 
 	constructor(endpoint: string, method: HttpMethodType) {
-		this.endpoint = endpoint;
 		this.request = {
 			endpoint: endpoint,
 			method: method,
 			headers: new Headers(),
-			body: null
+			body: null,
+			parameters: {}
 		}
 	}
 	
@@ -56,7 +54,7 @@ export abstract class RequestWithAcceptBuilder implements IRequestWithAcceptBuil
 			.bindAsync<Unit>(response => ResponseExtensions.toUnit(response))
 	}
 
-	private innerFetch = () => fetch(this.getUrl(this.endpoint, this.parameters), this.getRequest());
+	private innerFetch = () => fetch(this.getUrl(this.request.endpoint, this.request.parameters), this.getRequest());
 
 	private getUrl = (endpoint: string, parameters: { [key: string] : any }) => {
 		const url = new URL(endpoint);

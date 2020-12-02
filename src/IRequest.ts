@@ -5,5 +5,6 @@ export interface IRequest {
 	endpoint: string,
 	method: HttpMethodType,
 	headers: Headers,
-	body: BodyInit
+	body: BodyInit,
+	parameters: { [key: string] : string }
 }

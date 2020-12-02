@@ -14,6 +14,16 @@ const addHeaders = (request: IRequest, headers: { [key: string]: string }) : IRe
 	return request;
 }
 
+const addParameter = (request: IRequest, name: string, value: string) : IRequest => {
+	request.parameters[name] = value
+	return request;
+}
+
+const addParameters = (request: IRequest, parameters: { [key: string]: string }) : IRequest => {
+	request.parameters = { ...request.parameters, ...parameters }
+	return request;
+}
+
 const setJSONBody = (request: IRequest, body: object): IRequest => {
 	request.body = JSON.stringify(body);
 	return request;
@@ -44,6 +54,8 @@ const setURLSearchParameters = (request: IRequest, data: { [key: string]: string
 export const IRequestExtensions = {
 	addHeader,
 	addHeaders,
+	addParameter,
+	addParameters,
 	setJSONBody,
 	setFormDataBody,
 	setURLSearchParameters
