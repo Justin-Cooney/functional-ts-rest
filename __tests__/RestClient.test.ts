@@ -1,5 +1,6 @@
 import { Unit } from "functional-ts-primitives";
 import { RestClientFactory } from "../src";
+import { requestBuilder } from "../src/RequestBuilder";
 
 const api = "http://localhost:55304";
 
@@ -9,6 +10,40 @@ interface IToDo {
 	title: string,
 	completed: boolean
 }
+
+describe('factory tests', () => {
+	test('factory create client with headers', async () => {
+		var result = await RestClientFactory
+			.withHeader('SomeHeader', 'SomeValue')
+			.withHeader('OtherHeader', 'OtherValue')
+			.create()
+			.postAsync(`${api}/test/PostWithHeaders`)
+			.acceptJson()
+			.asUnit();
+		expect(result.isSuccess()).toBeTruthy();
+		expect(result.match(model => model, error => null)).toBe(Unit);
+	});
+	test('factory with bearer token', async () => {
+		var result = await RestClientFactory
+			.withBearer('SomeToken')
+			.create()
+			.postAsync(`${api}/test/PostWithBearerToken`)
+			.acceptJson()
+			.asUnit();
+		expect(result.isSuccess()).toBeTruthy();
+		expect(result.match(model => model, error => null)).toBe(Unit);
+	});
+	test('factory with mapper', async () => {
+		var result = await RestClientFactory
+			.with(request => ({ ...request, headers: { SomeHeader : "SomeValue" } }))
+			.create()
+			.postAsync(`${api}/test/PostWithHeader`)
+			.acceptJson()
+			.asUnit();
+		expect(result.isSuccess()).toBeTruthy();
+		expect(result.match(model => model, error => null)).toBe(Unit);
+	});
+});
 
 describe('getAsync', () => {
 	test('getAsync as Unit returns success', async () => {
@@ -21,20 +56,20 @@ describe('getAsync', () => {
 		expect(result.match(model => model, error => null)).toBe(Unit);
 	});
 
-	test('getAsync as model returns model', async () => {
-		var result = await RestClientFactory
-			.create()
-			.getAsync(`${api}/test/GetReturnJsonModel`)
-			.acceptJson()
-			.as<IToDo>();
-		expect(result.isSuccess()).toBeTruthy();
-		expect(result.match(model => model, error => null)).toStrictEqual({
-			userId: 1,
-			id: 1,
-			title: "delectus aut autem",
-			completed: true
-		});
-	});
+	// test('getAsync as model returns model', async () => {
+	// 	var result = await RestClientFactory
+	// 		.create()
+	// 		.getAsync(`${api}/test/GetReturnJsonModel`)
+	// 		.acceptJson()
+	// 		.as<IToDo>();
+	// 	expect(result.isSuccess()).toBeTruthy();
+	// 	expect(result.match(model => model, error => null)).toStrictEqual({
+	// 		userId: 1,
+	// 		id: 1,
+	// 		title: "delectus aut autem",
+	// 		completed: true
+	// 	});
+	// });
 
 	test('getAsync with test query parameter', async () => {
 		var result = await RestClientFactory
@@ -142,7 +177,7 @@ describe('postAsync', () => {
 		var result = await RestClientFactory
 			.create()
 			.postAsync(`${api}/test/PostWithJsonBody`)
-			.withJSONBody({
+			.withJson({
 				userId: 1,
 				id: 1,
 				title: "delectus aut autem",
@@ -191,6 +226,18 @@ describe('postAsync', () => {
 			.create()
 			.postAsync(`${api}/test/PostWithHeader`)
 			.withHeader('SomeHeader', 'SomeValue')
+			.acceptJson()
+			.asUnit();
+		expect(result.isSuccess()).toBeTruthy();
+		expect(result.match(model => model, error => null)).toBe(Unit);
+	});
+
+	test('postAsync with headers', async () => {
+		var result = await RestClientFactory
+			.create()
+			.postAsync(`${api}/test/PostWithHeaders`)
+			.withHeader('SomeHeader', 'SomeValue')
+			.withHeader('OtherHeader', 'OtherValue')
 			.acceptJson()
 			.asUnit();
 		expect(result.isSuccess()).toBeTruthy();
@@ -255,6 +302,45 @@ describe('errors', () => {
 			.deleteAsync(`${api}/test/ExceptionTest`)
 			.asUnit();
 		expect(result.isSuccess()).toBeFalsy();
-		expect(result.match(model => null, error => error.message)).toContain("Some unexpected exception");
+		expect(result.match(model => null, error => error.match(response => response.status, ex => null))).toBe(500);
+	});
+	test('exceptions are returned', async () => {
+		var result = await RestClientFactory
+			.create()
+			.deleteAsync(`http:/F>AGAFDg/./.`)
+			.asUnit();
+		expect(result.isSuccess()).toBeFalsy();
+		expect(result.match(model => null, error => error.match(response => null, ex => ex.message))).toBe("request to http://f/%3Eagafdg/ failed, reason: getaddrinfo ENOTFOUND f");
+	});
+
+	test('factory map failure', async () => {
+		var result = await RestClientFactory
+			.withFailure(error => `SomeError ${error.match(response => response.status.toString(), ex => ex.message)}`)
+			.create()
+			.deleteAsync(`http:/F>AGAFDg/./.`)
+			.asUnit();
+		expect(result.isSuccess()).toBeFalsy();
+		expect(result.match(model => null, error => error)).toBe("SomeError request to http://f/%3Eagafdg/ failed, reason: getaddrinfo ENOTFOUND f");
+	});
+
+	test('factory map failure', async () => {
+		var result = await RestClientFactory
+			.withFailure(error => `SomeError ${error.match(response => response.status.toString(), ex => ex.message)}`)
+			.create()
+			.deleteAsync(`${api}/test/ExceptionTest`)
+			.asUnit();
+		expect(result.isSuccess()).toBeFalsy();
+		expect(result.match(model => null, error => error)).toBe("SomeError 500");
+	});
+
+	test('call map failure', async () => {
+		var result = await RestClientFactory
+			.withFailure(error => `SomeError ${error.match(response => response.status.toString(), ex => ex.message)}`)
+			.create()
+			.deleteAsync(`${api}/test/ExceptionTest`)
+			.withFailure(error => `SomeFailure ${error.match(response => response.status.toString(), ex => ex.message)}`)
+			.asUnit();
+		expect(result.isSuccess()).toBeFalsy();
+		expect(result.match(model => null, error => error)).toBe("SomeFailure 500");
 	});
 });

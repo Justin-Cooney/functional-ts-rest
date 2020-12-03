@@ -1,19 +1,18 @@
-import { IRequestBuilder } from "./builders/interfaces/IRequestBuilder";
-import { RequestBuilder } from "./builders/RequestBuilder";
+import { restRequestBuilder } from "./RestRequestBuilder";
+import { IRestRequestBuilder } from "./RestRequestBuilder";
 import { HttpMethod } from "./HttpMethod";
-import { IRestClient } from "./IRestClient";
+import { IRequest } from "./IRequest";
 
-export class RestClient implements IRestClient {
-	getAsync(endpoint: string) : IRequestBuilder {
-		return new RequestBuilder(endpoint, HttpMethod.Get);
-	};
-	postAsync(endpoint: string) : IRequestBuilder {
-		return new RequestBuilder(endpoint, HttpMethod.Post)
-	};
-	putAsync(endpoint: string) : IRequestBuilder {
-		return new RequestBuilder(endpoint, HttpMethod.Put)
-	};
-	deleteAsync(endpoint: string): IRequestBuilder {
-		return new RequestBuilder(endpoint, HttpMethod.Delete)
-	}
+export interface IRestClient<TFailure> {
+	getAsync: (endpoint: string) => IRestRequestBuilder<TFailure>,
+	postAsync: (endpoint: string) => IRestRequestBuilder<TFailure>,
+	putAsync: (endpoint: string) => IRestRequestBuilder<TFailure>,
+	deleteAsync: (endpoint: string) => IRestRequestBuilder<TFailure>
 }
+
+export const restClient = <TFailure>(request: IRequest<TFailure>) : IRestClient<TFailure> => ({
+	getAsync: (endpoint: string) => restRequestBuilder(endpoint, HttpMethod.Get, request),
+	postAsync: (endpoint: string) => restRequestBuilder(endpoint, HttpMethod.Post, request),
+	putAsync: (endpoint: string) => restRequestBuilder(endpoint, HttpMethod.Put, request),
+	deleteAsync: (endpoint: string) => restRequestBuilder(endpoint, HttpMethod.Delete, request),
+});

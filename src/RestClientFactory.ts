@@ -1,6 +1,19 @@
-import { IRestClient } from "./IRestClient";
-import { RestClient } from "./RestClient";
+import { IRestClient, restClient } from "./RestClient";
+import { requestBuilder } from "./RequestBuilder";
+import { IRequestBuilder } from "./RequestBuilder";
+import { IRequest } from "./IRequest";
+import { ErrorResponse } from "./ErrorResponse";
 
-export const RestClientFactory = {
-	create: () : IRestClient => new RestClient()
+export interface IRestClientFactory<TFailure> extends IRequestBuilder<IRestClientFactory<TFailure>> {
+	create() : IRestClient<TFailure>,
+	withFailure: <TNewFailure>(mapFailure: (errorResponse: ErrorResponse) => TNewFailure) => IRestClientFactory<TNewFailure>
 }
+
+export const restClientFactory = <TFailure>(request: IRequest<TFailure>) : IRestClientFactory<TFailure> => ({
+	...requestBuilder(request, (r) => restClientFactory(r)),
+	create: () => restClient(request),
+	withFailure: <TNewFailure>(mapFailure: (errorResponse: ErrorResponse) => TNewFailure) => restClientFactory({
+		...request,
+		failureMapper: mapFailure
+	})
+});
