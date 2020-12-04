@@ -1,5 +1,5 @@
 {
-  "name": "functional-ts-react",
+  "name": "functional-ts-rest",
   "version": "1.0.0",
   "description": "A functional and fluent rest client for TypeScript",
   "main": "index.js",
@@ -7,12 +7,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Justin-Cooney/functional-ts-react.git"
+    "url": "git+https://github.com/Justin-Cooney/functional-ts-rest.git"
   },
   "bugs": {
-    "url": "https://github.com/Justin-Cooney/functional-ts-react/issues"
+    "url": "https://github.com/Justin-Cooney/functional-ts-rest/issues"
   },
-  "homepage": "https://github.com/Justin-Cooney/functional-ts-react#readme",
+  "homepage": "https://github.com/Justin-Cooney/functional-ts-rest#readme",
   "devDependencies": {
     "@types/jest": "^25.1.2",
     "jest": "^26.6.3",
