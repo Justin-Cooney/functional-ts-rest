@@ -1,6 +1,6 @@
 {
   "name": "functional-ts-rest",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A functional and fluent rest client for TypeScript",
   "main": "index.js",
   "author": "Justin Cooney",
