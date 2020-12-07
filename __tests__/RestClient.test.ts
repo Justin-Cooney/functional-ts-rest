@@ -1,6 +1,5 @@
 import { Unit } from "functional-ts-primitives";
-import { RestClientFactory } from "../src";
-import { requestBuilder } from "../src/RequestBuilder";
+import { RestClientFactory, IRestClient, ErrorResponse } from "../src";
 
 const api = "http://localhost:55304";
 
@@ -13,13 +12,16 @@ interface IToDo {
 
 describe('factory tests', () => {
 	test('factory create client with headers', async () => {
-		var result = await RestClientFactory
-			.withHeader('SomeHeader', 'SomeValue')
-			.withHeader('OtherHeader', 'OtherValue')
-			.create()
-			.postAsync(`${api}/test/PostWithHeaders`)
-			.acceptJson()
-			.asUnit();
+		const restClient : IRestClient<ErrorResponse> =
+			RestClientFactory
+				.withHeader('SomeHeader', 'SomeValue')
+				.withHeader('OtherHeader', 'OtherValue')
+				.create();
+		const result = 
+			await restClient
+				.postAsync(`${api}/test/PostWithHeaders`)
+				.acceptJson()
+				.asUnit();
 		expect(result.isSuccess()).toBeTruthy();
 		expect(result.match(model => model, error => null)).toBe(Unit);
 	});
@@ -314,11 +316,14 @@ describe('errors', () => {
 	});
 
 	test('factory map failure', async () => {
-		var result = await RestClientFactory
+		const restClient : IRestClient<string> = RestClientFactory
 			.withFailure(error => `SomeError ${error.match(response => response.status.toString(), ex => ex.message)}`)
-			.create()
-			.deleteAsync(`http:/F>AGAFDg/./.`)
-			.asUnit();
+			.create();
+
+		const result = 
+			await restClient
+				.deleteAsync(`http:/F>AGAFDg/./.`)
+				.asUnit();
 		expect(result.isSuccess()).toBeFalsy();
 		expect(result.match(model => null, error => error)).toBe("SomeError request to http://f/%3Eagafdg/ failed, reason: getaddrinfo ENOTFOUND f");
 	});

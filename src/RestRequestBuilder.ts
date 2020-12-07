@@ -77,7 +77,7 @@ const getRequest = <TFailure>(request: IRequest<TFailure>, method: HttpMethodTyp
 	var requestInit : RequestInit = {
 		method: method,
 		headers: request.headers,
-		body: request.body
+		body: request.body ?? undefined
 	};
 	request.requestInitMappers.forEach(mapper => requestInit = mapper(requestInit));
 	return requestInit;

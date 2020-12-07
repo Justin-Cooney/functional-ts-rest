@@ -3,7 +3,7 @@ import { ErrorResponse } from "./ErrorResponse";
 
 export interface IRequest<TFailure> {
 	headers: { [key: string] : string },
-	body: BodyInit,
+	body: BodyInit | null,
 	parameters: { [key: string] : string },
 	requestInitMappers: ((request: RequestInit) => RequestInit)[],
 	failureMapper: (error: ErrorResponse) => TFailure

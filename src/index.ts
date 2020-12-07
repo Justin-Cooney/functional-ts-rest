@@ -1,4 +1,5 @@
 import { restClientFactory } from "./RestClientFactory";
+export { IRestClient } from './RestClient';
 
 export * from "./ErrorResponse";
 export * from "./HttpMethod";
@@ -11,5 +12,3 @@ export const RestClientFactory = restClientFactory({
 	requestInitMappers: [],
 	failureMapper: error => error
 });
-
-export const RestClient = RestClientFactory.create();
