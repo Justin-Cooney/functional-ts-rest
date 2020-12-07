@@ -27,13 +27,55 @@ describe('factory tests', () => {
 	});
 	test('factory with bearer token', async () => {
 		var result = await RestClientFactory
-			.withBearer('SomeToken')
+			.withBearer(() => 'SomeToken')
 			.create()
 			.postAsync(`${api}/test/PostWithBearerToken`)
 			.acceptJson()
 			.asUnit();
 		expect(result.isSuccess()).toBeTruthy();
 		expect(result.match(model => model, error => null)).toBe(Unit);
+	});
+	test('factory with bearer token Async', async () => {
+		var result = await RestClientFactory
+			.withBearerAsync(async () => 'SomeToken')
+			.create()
+			.postAsync(`${api}/test/PostWithBearerToken`)
+			.acceptJson()
+			.asUnit();
+		expect(result.isSuccess()).toBeTruthy();
+		expect(result.match(model => model, error => null)).toBe(Unit);
+	});
+	test('factory with async bearer token overriden', async () => {
+		var result = await RestClientFactory
+			.withBearerAsync(async () => 'NotToken')
+			.create()
+			.postAsync(`${api}/test/PostWithBearerToken`)
+			.withBearer(() => 'SomeToken')
+			.acceptJson()
+			.asUnit();
+		expect(result.isSuccess()).toBeTruthy();
+		expect(result.match(model => model, error => null)).toBe(Unit);
+	});
+	test('factory with bearer token Async taht changes', async () => {
+		var flag = true;
+		var restClient = await RestClientFactory
+			.withBearerAsync(async () => flag ? 'SomeToken' : 'NotToken')
+			.create();
+
+		var result = await restClient
+			.postAsync(`${api}/test/PostWithBearerToken`)
+			.acceptJson()
+			.asUnit();
+		expect(result.isSuccess()).toBeTruthy();
+		expect(result.match(model => model, error => null)).toBe(Unit);
+
+		flag = false;
+		var result2 = await restClient
+			.postAsync(`${api}/test/PostWithBearerToken`)
+			.acceptJson()
+			.asUnit();
+		expect(result2.isSuccess()).toBeFalsy();
+		expect(result2.match(model => null, error => "Error")).toBe("Error");
 	});
 	test('factory with mapper', async () => {
 		var result = await RestClientFactory

@@ -1,5 +1,4 @@
 import { IRequest } from "./IRequest";
-import { ErrorResponse } from "./ErrorResponse";
 import FormData from "form-data";
 import URLSearchParams from "url-search-params";
 import { RequestInit } from "node-fetch";
@@ -10,7 +9,8 @@ export interface IRequestBuilder<TBase extends IRequestBuilder<TBase>> {
 	withParameters: (parameters: { [key: string]: string }) => TBase
 	withHeader: (key: string, value: string) => TBase
 	withHeaders: (headers: { [key: string]: string }) => TBase
-	withBearer: (token: string) => TBase
+	withBearer: (tokenFactory: () => string) => TBase
+	withBearerAsync: (tokenFactory: () => Promise<string>) => TBase
 	withJson: (body: object) => TBase
 	withFormData: (data: { [key: string]: string }) => TBase
 	withFormDataUrlEncoded: (data: { [key: string]: string }) => TBase
@@ -56,12 +56,19 @@ export const requestBuilder = <TBase extends IRequestBuilder<TBase>, TFailure>(r
 			...headers
 		}
 	}),
-	withBearer: (token: string) : TBase => baseFactory({
+	withBearer: (tokenFactory: () => string) : TBase => baseFactory({
 		...request,
-		headers : {
-			...request.headers,
-			Authorization: `Bearer ${token}`
-		}
+		headersAsync : [
+			...request.headersAsync,
+			(async () => ({ Authorization: `Bearer ${tokenFactory()}` }))
+		]
+	}),
+	withBearerAsync: (tokenFactory: () => Promise<string>) : TBase => baseFactory({
+		...request,
+		headersAsync: [
+			...request.headersAsync,
+			(async () => ({ Authorization: `Bearer ${await tokenFactory()}` }))
+		]
 	}),
 	withJson: (body: object) : TBase => baseFactory({
 			...request,
@@ -94,9 +101,5 @@ export const requestBuilder = <TBase extends IRequestBuilder<TBase>, TFailure>(r
 	accept : (type: string) : TBase => baseFactory(request).withHeader("Accept", type),
 	acceptJson : () : TBase => baseFactory(request).accept("application/json"),
 	acceptHtml: () : TBase => baseFactory(request).accept("text/html"),
-	acceptText : () : TBase => baseFactory(request).accept("text/plain"),
-	// withFailure : <TNewFailure>(mapFailure: (errorResponse: ErrorResponse) => TNewFailure) : TBase => baseFactory(({
-	// 	...request,
-	// 	failureMapper: mapFailure
-	// }))
+	acceptText : () : TBase => baseFactory(request).accept("text/plain")
 });

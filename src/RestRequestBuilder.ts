@@ -60,7 +60,7 @@ export const restRequestBuilder = <TFailure>(endpoint: string, method: HttpMetho
 	})
 });
 
-const fetchFromRequest = <TFailure>(endpoint: string, method: HttpMethodType, request: IRequest<TFailure>) => fetch(getUrl(endpoint, request.parameters), getRequest(request, method));
+const fetchFromRequest = async <TFailure>(endpoint: string, method: HttpMethodType, request: IRequest<TFailure>) => fetch(getUrl(endpoint, request.parameters), await getRequest(request, method));
 
 const getUrl = (endpoint: string, parameters: { [key: string] : any }) => {
 	const url = new URL(endpoint);
@@ -72,11 +72,15 @@ const getUrl = (endpoint: string, parameters: { [key: string] : any }) => {
 	return url;
 }
 
-const getRequest = <TFailure>(request: IRequest<TFailure>, method: HttpMethodType) : RequestInit =>
+const getRequest = async <TFailure>(request: IRequest<TFailure>, method: HttpMethodType) : Promise<RequestInit> =>
 {
+	var asyncHeaders = await Promise.all(request.headersAsync.map(getHeader => getHeader()));
 	var requestInit : RequestInit = {
 		method: method,
-		headers: request.headers,
+		headers: {
+			...Object.assign({}, ...asyncHeaders),
+			...request.headers
+		},
 		body: request.body ?? undefined
 	};
 	request.requestInitMappers.forEach(mapper => requestInit = mapper(requestInit));
