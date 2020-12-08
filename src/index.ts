@@ -10,6 +10,6 @@ export const RestClientFactory = restClientFactory({
 	body: null,
 	parameters: {},
 	requestInitMappers: [],
-	failureMapper: error => error,
+	failureMapper: async error => error,
 	headersAsync: []
 });

@@ -390,4 +390,39 @@ describe('errors', () => {
 		expect(result.isSuccess()).toBeFalsy();
 		expect(result.match(model => null, error => error)).toBe("SomeFailure 500");
 	});
+
+
+	test('factory map failure async', async () => {
+		const restClient : IRestClient<string> = RestClientFactory
+			.withFailureAsync(async error => `SomeError ${error.match(response => response.status.toString(), ex => ex.message)}`)
+			.create();
+
+		const result = 
+			await restClient
+				.deleteAsync(`http:/F>AGAFDg/./.`)
+				.asUnit();
+		expect(result.isSuccess()).toBeFalsy();
+		expect(result.match(model => null, error => error)).toBe("SomeError request to http://f/%3Eagafdg/ failed, reason: getaddrinfo ENOTFOUND f");
+	});
+
+	test('factory map failure async', async () => {
+		var result = await RestClientFactory
+			.withFailureAsync(async error => `SomeError ${error.match(response => response.status.toString(), ex => ex.message)}`)
+			.create()
+			.deleteAsync(`${api}/test/ExceptionTest`)
+			.asUnit();
+		expect(result.isSuccess()).toBeFalsy();
+		expect(result.match(model => null, error => error)).toBe("SomeError 500");
+	});
+
+	test('call map failure async', async () => {
+		var result = await RestClientFactory
+			.withFailureAsync(async error => `SomeError ${error.match(response => response.status.toString(), ex => ex.message)}`)
+			.create()
+			.deleteAsync(`${api}/test/ExceptionTest`)
+			.withFailureAsync(async error => `SomeFailure ${error.match(response => response.status.toString(), ex => ex.message)}`)
+			.asUnit();
+		expect(result.isSuccess()).toBeFalsy();
+		expect(result.match(model => null, error => error)).toBe("SomeFailure 500");
+	});
 });

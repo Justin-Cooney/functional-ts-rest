@@ -6,6 +6,6 @@ export interface IRequest<TFailure> {
 	body: BodyInit | null,
 	parameters: { [key: string] : string },
 	requestInitMappers: ((request: RequestInit) => RequestInit)[],
-	failureMapper: (error: ErrorResponse) => TFailure,
+	failureMapper: (error: ErrorResponse) => Promise<TFailure>,
 	headersAsync: (() => Promise<{ [key: string] : string }>)[]
 }
