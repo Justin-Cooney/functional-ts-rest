@@ -4,9 +4,32 @@ import { HttpMethod } from "./HttpMethod";
 import { IRequest } from "./IRequest";
 
 export interface IRestClient<TFailure> {
+	/**
+	 * Begins building a new `GET` request from the RestClient.
+	 * @param endpoint The rest endpoint to make a request against.
+	 * @returns A request builder.
+	 */
 	getAsync: (endpoint: string) => IRestRequestBuilder<TFailure>,
+
+	/**
+	 * Begins building a new `POST` request from the RestClient.
+	 * @param endpoint The rest endpoint to make a request against.
+	 * @returns A request builder.
+	 */
 	postAsync: (endpoint: string) => IRestRequestBuilder<TFailure>,
+
+	/**
+	 * Begins building a new `PUT` request from the RestClient.
+	 * @param endpoint The rest endpoint to make a request against.
+	 * @returns A request builder.
+	 */
 	putAsync: (endpoint: string) => IRestRequestBuilder<TFailure>,
+
+	/**
+	 * Begins building a new `DELETE` request from the RestClient.
+	 * @param endpoint The rest endpoint to make a request against.
+	 * @returns A request builder.
+	 */
 	deleteAsync: (endpoint: string) => IRestRequestBuilder<TFailure>
 }
 

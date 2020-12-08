@@ -1,4 +1,4 @@
-import { Unit } from "functional-ts-primitives";
+import { Unit, ResultPromise, Result } from "functional-ts-primitives";
 import { RestClientFactory, IRestClient, ErrorResponse } from "../src";
 
 const api = "http://localhost:55304";
@@ -200,6 +200,16 @@ describe('postAsync', () => {
 			.asUnit();
 		expect(result.isSuccess()).toBeTruthy();
 		expect(result.match(model => model, error => null)).toBe(Unit);
+	});
+
+	test('postAsync as response returns response', async () => {
+		var result = await RestClientFactory
+			.create()
+			.postAsync(`${api}/test/PostReturnJsonModel`)
+			.acceptJson()
+			.asResponse();
+		expect(result.isSuccess()).toBeTruthy();
+		expect(result.match(model => model.status, error => null)).toBe(200);
 	});
 
 	test('postAsync as model returns model', async () => {

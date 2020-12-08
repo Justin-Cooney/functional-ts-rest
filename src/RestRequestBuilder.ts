@@ -7,13 +7,54 @@ import { HttpMethodType } from "./HttpMethod";
 import { ErrorResponse } from "./ErrorResponse";
 
 export interface IRestRequestBuilder<TFailure> extends IRequestBuilder<IRestRequestBuilder<TFailure>> {
+	/**
+	 * Executes the request and returns a result with the successful response or failure value.
+	 * @returns A `Result<Response, TFailure>` with the successful response or a failure value.
+	 */
 	asResponse: () => ResultPromise<Response, TFailure>,
+
+	/**
+	 * Executes the request and parses a successful result to the specified model.
+	 * @returns A `Result<T, TFailure>` with the successful parsed response or a failure value.
+	 */
 	as: <T>() => ResultPromise<T, TFailure>,
+
+	/**
+	 * Executes the request and returns a successful `Unit` or a failure value.
+	 * @returns A `Result<Unit, TFailure>` with a successful `Unit` or a failure value.
+	 */
 	asUnit: () => ResultPromise<Unit, TFailure>,
+
+	/**
+	 * Executes the request and parses a successful result to a string of html.
+	 * @returns A `Result<string, TFailure>` with the successful html or a failure value.
+	 */
 	asHtml: () => ResultPromise<string, TFailure>
+
+	/**
+	 * Executes the request and parses a successful result to a string.
+	 * @returns A `Result<string, TFailure>` with the successful string or a failure value.
+	 */
 	asText: () => ResultPromise<string, TFailure>,
+
+	/**
+	 * Executes the request and parses a successful result to a Blob.
+	 * @returns A `Result<Blob, TFailure>` with the successful Blob or a failure value.
+	 */
 	asBlob: () => ResultPromise<Blob, TFailure>,
+
+	/**
+	 * Updates the builder to map error responses to a different error model.
+	 * @param mapFailure A function that maps an `ErrorResponse` to some new model.
+	 * @returns The builder with a new failure type.
+	 */
 	withFailure: <TNewFailure>(mapFailure: (errorResponse: ErrorResponse) => TNewFailure) => IRestRequestBuilder<TNewFailure>,
+
+	/**
+	 * Updates the builder to map error responses to a different error model.
+	 * @param mapFailure An async function that maps an `ErrorResponse` to some new model.
+	 * @returns The builder with a new failure type.
+	 */
 	withFailureAsync: <TNewFailure>(mapFailure: (errorResponse: ErrorResponse) => Promise<TNewFailure>) => IRestRequestBuilder<TNewFailure>
 }
 

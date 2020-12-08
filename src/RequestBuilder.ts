@@ -4,19 +4,101 @@ import URLSearchParams from "url-search-params";
 import { RequestInit } from "node-fetch";
 
 export interface IRequestBuilder<TBase extends IRequestBuilder<TBase>> {
+	/**
+	 * Maps the request properties to a new set of request properties.
+	 * @param mapper A function that maps the current `RequestInit` to a new `RequestInit`
+	 * @returns The current request builder.
+	 */
 	with: (mapper: (requestInit: RequestInit) => RequestInit) => TBase
+
+	/**
+	 * Adds a parameter to the url of the request.
+	 * @param key The key of the parameter.
+	 * @param value The value of the parameter.
+	 * @returns The current request builder.
+	 */
 	withParameter: (key: string, value: string) => TBase
+
+	/**
+	 * Adds parameters to the url of the request from an input object.
+	 * @param parameters An object containing the parameters to be added to the request url.
+	 * @returns The current request builder.
+	 */
 	withParameters: (parameters: { [key: string]: string }) => TBase
-	withHeader: (key: string, value: string) => TBase
+
+	/**
+	 * Adds a header to the request.
+	 * @param key The name of the header.
+	 * @param value The value of the header.
+	 * @returns The current request builder.
+	 */
+	withHeader: (name: string, value: string) => TBase
+
+	/**
+	 * Adds headers to the request from an input object.
+	 * @param headers An object containing the headers to be added to the request.
+	 * @returns The current request builder.
+	 */
 	withHeaders: (headers: { [key: string]: string }) => TBase
+
+	/**
+	 * Adds a function for generating authentication bearer tokens for the request.
+	 * @param tokenFactory A factory function that generates a bearer token for the request.
+	 * @returns The current request builder.
+	 */
 	withBearer: (tokenFactory: () => string) => TBase
+
+	/**
+	 * Adds an async function for generating authentication bearer tokens for the request.
+	 * @param tokenFactory An async factory function that generates a bearer token for the request.
+	 * @returns The current request builder.
+	 */
 	withBearerAsync: (tokenFactory: () => Promise<string>) => TBase
+
+	/**
+	 * Adds a json body to the request.
+	 * @param body An object to be parsed into json and added as the body of the request.
+	 * @returns The current request builder.
+	 */
 	withJson: (body: object) => TBase
+
+	/**
+	 * Adds form data to the request.
+	 * @param data An object to be parsed into form data and added to the form data of the request.
+	 * @returns The current request builder.
+	 */
 	withFormData: (data: { [key: string]: string }) => TBase
+
+	/**
+	 * Adds url encoded form data to the request.
+	 * @param data An object to be parsed into form data and added to the form data of the request.
+	 * @returns The current request builder.
+	 */
 	withFormDataUrlEncoded: (data: { [key: string]: string }) => TBase
+
+	/**
+	 * Adds an `Accept` header to the request.
+	 * @param type The value of the accept header.
+	 * @returns The current request builder.
+	 */
 	accept: (type: string) => TBase
+
+	/**
+	 * Adds an `Accept` header of type `application/json` to the request.
+	 * @returns The current request builder.
+	 */
 	acceptJson: () => TBase
+
+	/**
+	 * Adds an `Accept` header of type `text/html` to the request.
+	 * @returns The current request builder.
+	 */
 	acceptHtml: () => TBase
+
+	/**
+	 * Adds an `Accept` header of type `text/plain` to the request.
+	 * @returns The current request builder.
+	 */
 	acceptText: () => TBase
 }
 
