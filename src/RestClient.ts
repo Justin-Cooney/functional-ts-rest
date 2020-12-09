@@ -34,8 +34,8 @@ export interface IRestClient<TFailure> {
 }
 
 export const restClient = <TFailure>(request: IRequest<TFailure>) : IRestClient<TFailure> => ({
-	getAsync: (endpoint: string) => restRequestBuilder(endpoint, HttpMethod.Get, request),
-	postAsync: (endpoint: string) => restRequestBuilder(endpoint, HttpMethod.Post, request),
-	putAsync: (endpoint: string) => restRequestBuilder(endpoint, HttpMethod.Put, request),
-	deleteAsync: (endpoint: string) => restRequestBuilder(endpoint, HttpMethod.Delete, request),
+	getAsync: (endpoint: string) => restRequestBuilder(endpoint, HttpMethod.Get, request, null),
+	postAsync: (endpoint: string) => restRequestBuilder(endpoint, HttpMethod.Post, request, null),
+	putAsync: (endpoint: string) => restRequestBuilder(endpoint, HttpMethod.Put, request, null),
+	deleteAsync: (endpoint: string) => restRequestBuilder(endpoint, HttpMethod.Delete, request, null),
 });

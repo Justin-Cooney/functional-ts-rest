@@ -1,5 +1,6 @@
 import { Unit, ResultPromise, Result } from "functional-ts-primitives";
 import { RestClientFactory, IRestClient, ErrorResponse } from "../src";
+import { Response } from "node-fetch";
 
 const api = "http://localhost:55304";
 
@@ -434,5 +435,39 @@ describe('errors', () => {
 			.asUnit();
 		expect(result.isSuccess()).toBeFalsy();
 		expect(result.match(model => null, error => error)).toBe("SomeFailure 500");
+	});
+});
+
+describe('mocks', () => {
+	test('when mockResponse success returns as value', async () => {
+		var result = await RestClientFactory
+			.create()
+			.deleteAsync(`${api}/test/ExceptionTest`)
+			.mockResponse(() => new Response("", {
+				status: 200
+			}))
+			.asUnit();
+		expect(result.isSuccess()).toBeTruthy();
+		expect(result.match(model => model, error => error.match(response => null, ex => null))).toBe(Unit);
+	});
+
+	test('mockJSONBody returns error when error is thrown', async () => {
+		var result = await RestClientFactory
+			.create()
+			.deleteAsync(`${api}/test/ExceptionTest`)
+			.mockJSONBody(() => ({
+				userId: 1234,
+				id: 4321,
+				title: "string",
+				completed: false
+			}))
+			.as<IToDo>();
+		expect(result.isSuccess()).toBeTruthy();
+		expect(result.match(model => model, error => error.match(response => null, ex => null))).toStrictEqual(({
+			userId: 1234,
+			id: 4321,
+			title: "string",
+			completed: false
+		}));
 	});
 });
