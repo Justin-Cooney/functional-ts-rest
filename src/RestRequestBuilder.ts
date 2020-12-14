@@ -1,8 +1,8 @@
 import { IRequestBuilder, requestBuilder } from "./RequestBuilder"
 import { IRequest } from "./IRequest";
-import { ResultPromise, ResultFactory, Unit } from "functional-ts-primitives";
+import { ResultPromise, Result, Unit } from "functional-ts-primitives";
 import { ResponseExtensions } from "./ResponseExtensions";
-import fetch, { Response, RequestInit } from 'node-fetch';
+import fetch, { Response, RequestInit, Blob } from 'node-fetch';
 import { HttpMethodType } from "./HttpMethod";
 import { ErrorResponse } from "./ErrorResponse";
 
@@ -76,38 +76,38 @@ export interface IRestRequestBuilder<TFailure> extends IRequestBuilder<IRestRequ
 export const restRequestBuilder = <TFailure>(endpoint: string, method: HttpMethodType, request: IRequest<TFailure>, mockResponse: (() => Response) | null) : IRestRequestBuilder<TFailure> => ({
 	...requestBuilder<IRestRequestBuilder<TFailure>, TFailure>(request, request => restRequestBuilder(endpoint, method, request, mockResponse)),
 	asResponse: () : ResultPromise<Response, TFailure> =>
-		ResultFactory
+		Result
 			.tryAsync<Response>(() => fetchFromRequest(endpoint, method, request, mockResponse))
-			.mapFailure(error => ResultFactory.failure<Response, Error>(error))
+			.mapFailure(error => Result.failure<Response, Error>(error))
 			.mapFailureAsync(request.failureMapper),
 	as : <T>() : ResultPromise<T, TFailure> =>
-		 ResultFactory
+		Result
 		 	.tryAsync<Response>(() => fetchFromRequest(endpoint, method, request, mockResponse))
-			.mapFailure(error => ResultFactory.failure<Response, Error>(error))
+			.mapFailure(error => Result.failure<Response, Error>(error))
 			.bindAsync<T>(response => ResponseExtensions.toJsonResult<T>(response))
 			.mapFailureAsync(request.failureMapper),
 	asHtml: () : ResultPromise<string, TFailure> =>
-		ResultFactory
+		Result
 			.tryAsync<Response>(() => fetchFromRequest(endpoint, method, request, mockResponse))
-			.mapFailure(error => ResultFactory.failure<Response, Error>(error))
+			.mapFailure(error => Result.failure<Response, Error>(error))
 			.bindAsync<string>(response => ResponseExtensions.toHtmlResult(response))
 			.mapFailureAsync(request.failureMapper),
 	asText: () : ResultPromise<string, TFailure> =>
-		ResultFactory
+		Result
 			.tryAsync<Response>(() => fetchFromRequest(endpoint, method, request, mockResponse))
-			.mapFailure(error => ResultFactory.failure<Response, Error>(error))
+			.mapFailure(error => Result.failure<Response, Error>(error))
 			.bindAsync<string>(response => ResponseExtensions.toTextResult(response))
 			.mapFailureAsync(request.failureMapper),
 	asBlob: () : ResultPromise<Blob, TFailure> =>
-		ResultFactory
+		Result
 			.tryAsync<Response>(() => fetchFromRequest(endpoint, method, request, mockResponse))
-			.mapFailure(error => ResultFactory.failure<Response, Error>(error))
+			.mapFailure<ErrorResponse>(error => Result.failure<Response, Error>(error))
 			.bindAsync<Blob>(response => ResponseExtensions.toBlobResult(response))
 			.mapFailureAsync(request.failureMapper),
 	asUnit: () : ResultPromise<Unit, TFailure> =>
-		ResultFactory
+		Result
 			.tryAsync<Response>(() => fetchFromRequest(endpoint, method, request, mockResponse))
-			.mapFailure(error => ResultFactory.failure<Response, Error>(error))
+			.mapFailure(error => Result.failure<Response, Error>(error))
 			.bindAsync<Unit>(response => ResponseExtensions.toUnit(response))
 			.mapFailureAsync(request.failureMapper),
 	withFailure: <TNewFailure>(mapFailure: (errorResponse: ErrorResponse) => TNewFailure) => restRequestBuilder(endpoint, method, {
