@@ -127,12 +127,12 @@ const fetchFromRequest = async <TFailure>(endpoint: string, method: HttpMethodTy
 		? mockResponse()
 		: fetch(getUrl(endpoint, request.parameters), await getRequest(request, method));
 
-const getUrl = (endpoint: string, parameters: { [key: string] : any }) => {
+const getUrl = (endpoint: string, parameters: { [key: string] : string | undefined }) => {
 	const url = new URL(endpoint);
 	Object
 	.keys(parameters)
 	.map(key => {
-		url.searchParams.append(key, parameters[key]);
+		if(parameters[key] != undefined) url.searchParams.append(key, parameters[key] as string);
 	});
 	return url;
 }
@@ -140,11 +140,15 @@ const getUrl = (endpoint: string, parameters: { [key: string] : any }) => {
 const getRequest = async <TFailure>(request: IRequest<TFailure>, method: HttpMethodType) : Promise<RequestInit> =>
 {
 	var asyncHeaders = await Promise.all(request.headersAsync.map(getHeader => getHeader()));
+	var headers = {};
+	Object.keys(request.headers).map(key => {
+		if(request.headers[key] != undefined) headers[key] = request.headers[key];
+	});
 	var requestInit : RequestInit = {
 		method: method,
 		headers: {
 			...Object.assign({}, ...asyncHeaders),
-			...request.headers
+			...headers
 		},
 		body: request.body ?? undefined
 	};

@@ -17,14 +17,14 @@ export interface IRequestBuilder<TBase extends IRequestBuilder<TBase>> {
 	 * @param value The value of the parameter.
 	 * @returns The current request builder.
 	 */
-	withParameter: (key: string, value: string) => TBase
+	withParameter: (key: string, value: string | undefined) => TBase
 
 	/**
 	 * Adds parameters to the url of the request from an input object.
 	 * @param parameters An object containing the parameters to be added to the request url.
 	 * @returns The current request builder.
 	 */
-	withParameters: (parameters: { [key: string]: string }) => TBase
+	withParameters: (parameters: { [key: string]: string | undefined }) => TBase
 
 	/**
 	 * Adds a header to the request.
@@ -32,14 +32,14 @@ export interface IRequestBuilder<TBase extends IRequestBuilder<TBase>> {
 	 * @param value The value of the header.
 	 * @returns The current request builder.
 	 */
-	withHeader: (name: string, value: string) => TBase
+	withHeader: (name: string, value: string | undefined) => TBase
 
 	/**
 	 * Adds headers to the request from an input object.
 	 * @param headers An object containing the headers to be added to the request.
 	 * @returns The current request builder.
 	 */
-	withHeaders: (headers: { [key: string]: string }) => TBase
+	withHeaders: (headers: { [key: string]: string | undefined}) => TBase
 
 	/**
 	 * Adds a function for generating authentication bearer tokens for the request.
@@ -67,14 +67,14 @@ export interface IRequestBuilder<TBase extends IRequestBuilder<TBase>> {
 	 * @param data An object to be parsed into form data and added to the form data of the request.
 	 * @returns The current request builder.
 	 */
-	withFormData: (data: { [key: string]: string }) => TBase
+	withFormData: (data: { [key: string]: string | undefined }) => TBase
 
 	/**
 	 * Adds url encoded form data to the request.
 	 * @param data An object to be parsed into form data and added to the form data of the request.
 	 * @returns The current request builder.
 	 */
-	withFormDataUrlEncoded: (data: { [key: string]: string }) => TBase
+	withFormDataUrlEncoded: (data: { [key: string]: string | undefined }) => TBase
 
 	/**
 	 * Adds an `Accept` header to the request.
@@ -110,28 +110,28 @@ export const requestBuilder = <TBase extends IRequestBuilder<TBase>, TFailure>(r
 			mapper
 		]
 	}),
-	withParameter: (key: string, value: string) => baseFactory({
+	withParameter: (key: string, value: string | undefined) => baseFactory({
 		...request,
 		parameters: {
 			...request.parameters,
 			[key]: value
 		}
 	}),
-	withParameters: (parameters: { [key: string]: string }) : TBase => baseFactory({
+	withParameters: (parameters: { [key: string]: string | undefined }) : TBase => baseFactory({
 		...request,
 		parameters: {
 			...request.parameters,
 			...parameters
 		}
 	}),
-	withHeader: (key: string, value: string) : TBase => baseFactory({
+	withHeader: (key: string, value: string | undefined) : TBase => baseFactory({
 		...request,
 		headers : {
 			...request.headers,
 			[key] : value
 		}
 	}),
-	withHeaders: (headers: { [key: string]: string }) : TBase => baseFactory({
+	withHeaders: (headers: { [key: string]: string | undefined }) : TBase => baseFactory({
 		...request,
 		headers : {
 			...request.headers,
@@ -156,24 +156,24 @@ export const requestBuilder = <TBase extends IRequestBuilder<TBase>, TFailure>(r
 			...request,
 			body: JSON.stringify(body)
 	}).withHeader("Content-Type", "application/json"),
-	withFormData: (data: { [key: string]: string }) : TBase => {
+	withFormData: (data: { [key: string]: string | undefined }) : TBase => {
 		const formData = new FormData();
 		Object
 			.keys(data)
 			.map(key => {
-				formData.append(key, data[key]);
+				if(data[key] != undefined) formData.append(key, data[key]);
 			});
 		return baseFactory({
 			...request,
 			body: formData
 		})
 	},
-	withFormDataUrlEncoded: (data: { [key: string]: string }) : TBase => {
+	withFormDataUrlEncoded: (data: { [key: string]: string | undefined }) : TBase => {
 		const params = new URLSearchParams();
 		Object
 			.keys(data)
 			.map(key => {
-				params.append(key, data[key]);
+				if(data[key] != undefined) params.append(key, data[key]);
 			});
 		return baseFactory({
 			...request,

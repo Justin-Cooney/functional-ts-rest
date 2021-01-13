@@ -141,6 +141,32 @@ describe('getAsync', () => {
 		expect(result.match(model => model, error => null)).toBe(Unit);
 	});
 
+	test('getAsync with undefined query parameter', async () => {
+		var result = await RestClientFactory
+			.create()
+			.getAsync(`${api}/test/UndefinedParamsArentSent`)
+			.withParameter("shouldNotExist", undefined)
+			.withParameter("shouldExist", "SomeValue")
+			.acceptJson()
+			.asUnit();
+		expect(result.isSuccess()).toBeTruthy();
+		expect(result.match(model => model, error => null)).toBe(Unit);
+	});
+
+	test('getAsync with undefined query parameters', async () => {
+		var result = await RestClientFactory
+			.create()
+			.getAsync(`${api}/test/UndefinedParamsArentSent`)
+			.withParameters({
+				shouldNotExist: undefined,
+				shouldExist: "SomeValue"
+			})
+			.acceptJson()
+			.asUnit();
+		expect(result.isSuccess()).toBeTruthy();
+		expect(result.match(model => model, error => null)).toBe(Unit);
+	});
+
 	test('getAsync with test query parameter', async () => {
 		var result = await RestClientFactory
 			.create()
@@ -260,6 +286,20 @@ describe('postAsync', () => {
 		expect(result.match(model => model, error => null)).toBe(Unit);
 	});
 
+	test('postAsync with undefined form data', async () => {
+		var result = await RestClientFactory
+			.create()
+			.postAsync(`${api}/test/PostWithUndefinedFormData`)
+			.withFormData({
+				shouldNotExist: undefined,
+				shouldExist: "SomeType"
+			})
+			.acceptJson()
+			.asUnit();
+		expect(result.isSuccess()).toBeTruthy();
+		expect(result.match(model => model, error => null)).toBe(Unit);
+	});
+
 	test('postAsync with encoded form data', async () => {
 		var result = await RestClientFactory
 			.create()
@@ -269,6 +309,20 @@ describe('postAsync', () => {
 				id: "1",
 				title: "delectus aut autem",
 				completed: "true"
+			})
+			.acceptJson()
+			.asUnit();
+		expect(result.isSuccess()).toBeTruthy();
+		expect(result.match(model => model, error => null)).toBe(Unit);
+	});
+
+	test('postAsync with undefined encoded form data', async () => {
+		var result = await RestClientFactory
+			.create()
+			.postAsync(`${api}/test/PostWithUndefinedFormData`)
+			.withFormDataUrlEncoded({
+				shouldNotExist: undefined,
+				shouldExist: "SomeType"
 			})
 			.acceptJson()
 			.asUnit();
@@ -299,6 +353,18 @@ describe('postAsync', () => {
 		expect(result.match(model => model, error => null)).toBe(Unit);
 	});
 
+	test('postAsync with undefined headers', async () => {
+		var result = await RestClientFactory
+			.create()
+			.postAsync(`${api}/test/PostWithUndefinedHeader`)
+			.withHeader('SomeHeader', 'SomeValue')
+			.withHeader('BadHeader', undefined)
+			.acceptJson()
+			.asUnit();
+		expect(result.isSuccess()).toBeTruthy();
+		expect(result.match(model => model, error => null)).toBe(Unit);
+	});
+
 	test('postAsync with header', async () => {
 		var result = await RestClientFactory
 			.create()
@@ -306,6 +372,20 @@ describe('postAsync', () => {
 			.withHeaders({
 				SomeHeader: 'SomeValue',
 				OtherHeader: 'OtherValue'
+			})
+			.acceptJson()
+			.asUnit();
+		expect(result.isSuccess()).toBeTruthy();
+		expect(result.match(model => model, error => null)).toBe(Unit);
+	});
+
+	test('postAsync with undefined header', async () => {
+		var result = await RestClientFactory
+			.create()
+			.postAsync(`${api}/test/PostWithUndefinedHeader`)
+			.withHeaders({
+				SomeHeader: 'SomeValue',
+				BadHeader: undefined
 			})
 			.acceptJson()
 			.asUnit();
